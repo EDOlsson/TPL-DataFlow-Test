@@ -1,0 +1,27 @@
+﻿<Window x:Class="DataFlowDemo.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DataFlowDemo"
+        mc:Ignorable="d"
+        Title="TPL DataFlow Demo" Height="324.45" Width="525">
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Left" Margin="16">
+            <TextBlock Text="Age" FontWeight="Bold" Margin="8, 8, 8, 0" />
+            <TextBox Text="{Binding Age}" Margin="8, 0, 0, 8" />
+            
+            <Button DockPanel.Dock="Left" Width="72" Height="24" Command="{Binding Initialize}">Initialize</Button>
+        </StackPanel>
+
+        <ListBox ItemsSource="{Binding Sessions}" Margin="16">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="SessionViewModel" >
+                    <StackPanel Margin="8">
+                        <TextBlock Text="{Binding Status}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>
