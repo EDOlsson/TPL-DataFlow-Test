@@ -75,6 +75,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InverseBooleanToVisibilityConverter.cs" />
+    <Compile Include="TraceListenerView.xaml.cs">
+      <DependentUpon>TraceListenerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TraceListenerViewModel.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="SessionIdentifier.cs" />
@@ -92,6 +97,10 @@
       <DependentUpon>MainView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="TraceListenerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

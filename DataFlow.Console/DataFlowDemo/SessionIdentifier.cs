@@ -19,7 +19,7 @@ namespace DataFlowDemo
             Created = DateTimeOffset.Now;
         }
 
-        public override string ToString() => $"{Id} created on {Created:g}.";
+        public override string ToString() => $"{Id:00000} created on {Created:g}.";
 
         public static readonly SessionIdentifier Empty = new SessionIdentifier(0);
     }

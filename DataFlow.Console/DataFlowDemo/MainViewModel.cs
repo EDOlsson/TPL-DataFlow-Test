@@ -15,11 +15,12 @@ namespace DataFlowDemo
 
         int _age;
 
-        public MainViewModel(IDataStore dataStore)
+        public MainViewModel(IDataStore dataStore, TraceListenerViewModel traceMessages)
         {
             _dataStore = dataStore;
             Initialize = new MethodCommand(_ => InitializeSessionAsync());
             Sessions = new ObservableCollection<SessionViewModel>();
+            TraceMessages = traceMessages;
         }
 
         public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
@@ -50,6 +51,8 @@ namespace DataFlowDemo
 
             await session.InitializeAsync();
         }
+
+        public TraceListenerViewModel TraceMessages { get; }
 
         class MethodCommand : ICommand
         {

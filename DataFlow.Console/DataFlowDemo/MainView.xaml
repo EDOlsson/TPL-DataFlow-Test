@@ -7,6 +7,8 @@
         mc:Ignorable="d"
         Title="TPL DataFlow Demo" Height="324.45" Width="525">
     <DockPanel LastChildFill="True">
+        <local:TraceListenerView DockPanel.Dock="Bottom" DataContext="{Binding TraceMessages}" />
+
         <StackPanel DockPanel.Dock="Left" Margin="16">
             <TextBlock Text="Age" FontWeight="Bold" Margin="8, 8, 8, 0" />
             <TextBox Text="{Binding Age}" Margin="8, 0, 0, 8" />

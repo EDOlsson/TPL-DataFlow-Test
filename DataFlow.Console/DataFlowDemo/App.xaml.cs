@@ -29,7 +29,9 @@ namespace DataFlowDemo
 
             System.Diagnostics.Debug.Assert(DataStore != null);
 
-            var mainViewModel = new MainViewModel(DataStore);
+            var traceMessages = new TraceListenerViewModel();
+
+            var mainViewModel = new MainViewModel(DataStore, traceMessages);
 
             var mainView = new MainView { DataContext = mainViewModel };
 
