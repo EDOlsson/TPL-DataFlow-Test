@@ -9,15 +9,15 @@ namespace DataFlowDemo
 {
     class SessionViewModel : INotifyPropertyChanged
     {
-        readonly IDataStore _dataStore;
+        readonly IBackEndService _service;
         readonly int _age;
 
         string _status;
         SessionIdentifier _sessionId;
 
-        public SessionViewModel(IDataStore dataStore, int age)
+        public SessionViewModel(IBackEndService service, int age)
         {
-            _dataStore = dataStore;
+            _service = service;
             _age = age;
         }
 
@@ -40,7 +40,7 @@ namespace DataFlowDemo
         {
             Status = "Initializing...";
 
-            _sessionId = await _dataStore.InitializeAsync(_age);
+            _sessionId = await _service.InitializeAsync(_age);
 
             Status = _sessionId.ToString();
         }

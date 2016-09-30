@@ -27,11 +27,11 @@ namespace DataFlowDemo
             var compositionHost = config.CreateContainer();
             compositionHost.SatisfyImports(this);
 
-            System.Diagnostics.Debug.Assert(DataStore != null);
+            System.Diagnostics.Debug.Assert(BackEndService != null);
 
             var traceMessages = new TraceListenerViewModel();
 
-            var mainViewModel = new MainViewModel(DataStore, traceMessages);
+            var mainViewModel = new MainViewModel(BackEndService, traceMessages);
 
             var mainView = new MainView { DataContext = mainViewModel };
 
@@ -39,6 +39,6 @@ namespace DataFlowDemo
         }
 
         [Import]
-        internal IDataStore DataStore { get; set; }
+        internal IBackEndService BackEndService { get; set; }
     }
 }

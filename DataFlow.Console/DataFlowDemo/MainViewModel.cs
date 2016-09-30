@@ -11,13 +11,13 @@ namespace DataFlowDemo
 {
     class MainViewModel : INotifyPropertyChanged
     {
-        readonly IDataStore _dataStore;
+        readonly IBackEndService _backEndService;
 
         int _age;
 
-        public MainViewModel(IDataStore dataStore, TraceListenerViewModel traceMessages)
+        public MainViewModel(IBackEndService service, TraceListenerViewModel traceMessages)
         {
-            _dataStore = dataStore;
+            _backEndService = service;
             Initialize = new MethodCommand(_ => InitializeSessionAsync());
             Sessions = new ObservableCollection<SessionViewModel>();
             TraceMessages = traceMessages;
@@ -44,7 +44,7 @@ namespace DataFlowDemo
 
         async Task InitializeSessionAsync()
         {
-            var session = new SessionViewModel(_dataStore, Age);
+            var session = new SessionViewModel(_backEndService, Age);
             Sessions.Add(session);
 
             Age++;
