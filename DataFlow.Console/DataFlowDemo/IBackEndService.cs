@@ -13,5 +13,9 @@ namespace DataFlowDemo
         Task PostDataAsync(SessionIdentifier id, Data data);
 
         Task<object> FetchAnalyticsAsync(SessionIdentifier id);
+
+        Task DeleteSessionAsync(SessionIdentifier id);
+
+        Task DeleteAllSessionsAsync();
     }
 }

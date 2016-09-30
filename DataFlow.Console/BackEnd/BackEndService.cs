@@ -106,6 +106,16 @@ namespace BackEnd
             return await _spectraServiceBlock.ReceiveAsync();
         }
 
+        public Task DeleteSessionAsync(SessionIdentifier id)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteAllSessionsAsync()
+        {
+            return Task.CompletedTask;
+        }
+
         class ServiceRequest
         {
             public static readonly ServiceRequest EmptyRequest = new ServiceRequest();
