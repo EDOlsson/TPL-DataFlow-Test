@@ -47,5 +47,10 @@ namespace BackEnd
         {
             TheData.Remove(key);
         }
+
+        public void DeleteAllSessions()
+        {
+            TheData.Clear();
+        }
     }
 }

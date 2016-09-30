@@ -108,3 +108,20 @@ let ``Given an initialized session When deleting that session Then that session 
     sut.DeleteSessionAsync(id).Wait()
 
     idLookup.TheData |> should haveCount 0
+
+[<Fact>]
+let ``Given many initialized sessions When deleting all sessions Then all the sessions are removed`` () =
+    let idLookup = new DataStore()
+    let service = new ServiceSpy()
+    let sut = new BackEndService(idLookup, service)
+
+    sut.InitializeAsync(1).Wait()
+    sut.InitializeAsync(2).Wait()
+    sut.InitializeAsync(3).Wait()
+    sut.InitializeAsync(4).Wait()
+
+    idLookup.TheData.Count |> should equal 4
+
+    sut.DeleteAllSessionsAsync().Wait()
+
+    idLookup.TheData.Count |> should equal 0

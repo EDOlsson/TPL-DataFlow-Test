@@ -64,9 +64,12 @@ namespace BackEnd
             await t.ConfigureAwait(false);
         }
 
-        public Task DeleteAllSessionsAsync()
+        public async Task DeleteAllSessionsAsync()
         {
-            return Task.CompletedTask;
+            _dataStoreBlock.Post(new DeleteAllSessionsRequest());
+
+            var t = _spectraServiceBlock.ReceiveAsync();
+            await t.ConfigureAwait(false);
         }
 
         ServiceRequest ProcessRequest(DataStoreRequest request)
@@ -94,10 +97,12 @@ namespace BackEnd
             }
 
             var deleteSingleSession = request as DeleteSessionFromDataStoreRequest;
-            if(deleteSingleSession != null)
-            {
+            if (deleteSingleSession != null)
                 _dataStore.DeleteSession(deleteSingleSession.Id);
-            }
+
+            var deleteAllSessions = request as DeleteAllSessionsRequest;
+            if (deleteAllSessions != null)
+                _dataStore.DeleteAllSessions();
 
             return ServiceRequest.EmptyRequest;
         }
