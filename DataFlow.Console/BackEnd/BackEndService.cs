@@ -56,9 +56,12 @@ namespace BackEnd
             return await _spectraServiceBlock.ReceiveAsync();
         }
 
-        public Task DeleteSessionAsync(SessionIdentifier id)
+        public async Task DeleteSessionAsync(SessionIdentifier id)
         {
-            return Task.CompletedTask;
+            _dataStoreBlock.Post(new DeleteSessionFromDataStoreRequest(id));
+
+            var t = _spectraServiceBlock.ReceiveAsync();
+            await t.ConfigureAwait(false);
         }
 
         public Task DeleteAllSessionsAsync()
@@ -90,6 +93,12 @@ namespace BackEnd
                 return new FetchAnalyticsServiceRequest(bed);
             }
 
+            var deleteSingleSession = request as DeleteSessionFromDataStoreRequest;
+            if(deleteSingleSession != null)
+            {
+                _dataStore.DeleteSession(deleteSingleSession.Id);
+            }
+
             return ServiceRequest.EmptyRequest;
         }
 
@@ -105,6 +114,9 @@ namespace BackEnd
         object ContactSpectraService(ServiceRequest request)
         {
             System.Diagnostics.Trace.WriteLine($"Processing request {request}.");
+
+            if (request == ServiceRequest.EmptyRequest)
+                return null;
 
             var initializeRequest = request as NoOpServiceRequestWithId;
             if (initializeRequest != null)

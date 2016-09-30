@@ -97,4 +97,14 @@ let ``Given no initialized sessions When deleting an unknown session Then xxx`` 
 
 [<Fact>]
 let ``Given an initialized session When deleting that session Then that session is removed`` () =
-    ()
+    let idLookup = new DataStore()
+    let service = new ServiceSpy()
+    let sut = new BackEndService(idLookup, service)
+
+    let id = sut.InitializeAsync(21).Result
+
+    idLookup.TheData |> should haveCount 1
+
+    sut.DeleteSessionAsync(id).Wait()
+
+    idLookup.TheData |> should haveCount 0

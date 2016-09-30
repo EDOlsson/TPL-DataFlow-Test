@@ -31,9 +31,9 @@ namespace BackEnd.Request
         }
     }
 
-    class DeleteSessionRequest : FetchIdFromDataStoreRequest
+    class DeleteSessionFromDataStoreRequest : FetchIdFromDataStoreRequest
     {
-        public DeleteSessionRequest(SessionIdentifier id) : base(id)
+        public DeleteSessionFromDataStoreRequest(SessionIdentifier id) : base(id)
         {
         }
     }

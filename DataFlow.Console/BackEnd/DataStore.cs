@@ -42,5 +42,10 @@ namespace BackEnd
 
             return BedId.None;
         }
+
+        public void DeleteSession(SessionIdentifier key)
+        {
+            TheData.Remove(key);
+        }
     }
 }
