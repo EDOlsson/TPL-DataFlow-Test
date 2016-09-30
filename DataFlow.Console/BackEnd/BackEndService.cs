@@ -13,14 +13,14 @@ namespace BackEnd
     public class BackEndService : IBackEndService
     {
         readonly DataStore _dataStore;
-        readonly IFakeSpectraService _spectraService;
+        readonly ISpectraService _spectraService;
 
         readonly TransformBlock<DataStoreRequest, ServiceRequest> _dataStoreBlock;
         readonly TransformBlock<ServiceRequest, object> _spectraServiceBlock;
 
-        public BackEndService() : this(new DataStore(), new FakeSpectraService()) { }
+        public BackEndService() : this(new DataStore(), new SlowFakeSpectraService()) { }
 
-        internal BackEndService(DataStore dataStore, IFakeSpectraService spectraService)
+        internal BackEndService(DataStore dataStore, ISpectraService spectraService)
         {
             _dataStore = dataStore;
             _spectraService = spectraService;
@@ -44,7 +44,15 @@ namespace BackEnd
             var postRequest = request as PostDataToSessionRequest;
             if(postRequest != null)
             {
-                return new PostFetalDataServiceRequest(postRequest.Id, postRequest.FetalData);
+                var bed = _dataStore.TheData[postRequest.Id];
+                return new PostFetalDataServiceRequest(bed, postRequest.FetalData);
+            }
+
+            var fetchAnalytics = request as FetchIdForRetrievingAnalyticsDataStoreRequest;
+            if (fetchAnalytics != null)
+            {
+                var bed = _dataStore.TheData[fetchAnalytics.Id];
+                return new FetchAnalyticsServiceRequest(bed);
             }
 
             return ServiceRequest.EmptyRequest;
@@ -65,6 +73,12 @@ namespace BackEnd
                 return null;
             }
 
+            var fetchRequest = request as FetchAnalyticsServiceRequest;
+            if (fetchRequest != null)
+                return _spectraService.FetchAnalytics(fetchRequest.Id);
+
+
+            System.Diagnostics.Trace.WriteLine($"WARN - was not able to process request {request}.");
             return null;
         }
 
@@ -87,16 +101,9 @@ namespace BackEnd
 
         public async Task<object> FetchAnalyticsAsync(SessionIdentifier id)
         {
-            return new object();
-        }
+            _dataStoreBlock.Post(new FetchIdForRetrievingAnalyticsDataStoreRequest(id));
 
-        enum BackEndRequest
-        {
-            Initialize = 0,
-            PostData,
-            FetchAnalytics,
-            DeleteSession,
-            DeleteAll
+            return await _spectraServiceBlock.ReceiveAsync();
         }
 
         class ServiceRequest
@@ -122,17 +129,29 @@ namespace BackEnd
 
         class PostFetalDataServiceRequest : ServiceRequest
         {
-            public SessionIdentifier Id { get; }
+            public BedId Id { get; }
 
             public Data FetalData { get; }
 
-            public PostFetalDataServiceRequest(SessionIdentifier id, Data fetalData)
+            public PostFetalDataServiceRequest(BedId id, Data fetalData)
             {
                 Id = id;
                 FetalData = fetalData;
             }
 
             public override string ToString() => string.Format($"Post fetal data for session {Id} : {FetalData}.");
+        }
+
+        class FetchAnalyticsServiceRequest : ServiceRequest
+        {
+            public BedId Id { get; }
+
+            public FetchAnalyticsServiceRequest(BedId id)
+            {
+                Id = id;
+            }
+
+            public override string ToString() => string.Format($"Fetch analytics for session {Id}.");
         }
 
 
@@ -148,31 +167,31 @@ namespace BackEnd
             }
         }
 
-        abstract class IdSpecificDataStoreRequest : DataStoreRequest
+        abstract class FetchIdFromDataStoreRequest : DataStoreRequest
         {
             public SessionIdentifier Id { get; }
 
-            protected IdSpecificDataStoreRequest(SessionIdentifier id)
+            protected FetchIdFromDataStoreRequest(SessionIdentifier id)
             {
                 Id = id;
             }
         }
 
-        class FetchSessionRequest : IdSpecificDataStoreRequest
+        class FetchIdForRetrievingAnalyticsDataStoreRequest : FetchIdFromDataStoreRequest
         {
-            public FetchSessionRequest(SessionIdentifier id) : base(id)
+            public FetchIdForRetrievingAnalyticsDataStoreRequest(SessionIdentifier id) : base(id)
             {
             }
         }
 
-        class DeleteSessionRequest : IdSpecificDataStoreRequest
+        class DeleteSessionRequest : FetchIdFromDataStoreRequest
         {
             public DeleteSessionRequest(SessionIdentifier id) : base(id)
             {
             }
         }
 
-        class PostDataToSessionRequest : IdSpecificDataStoreRequest
+        class PostDataToSessionRequest : FetchIdFromDataStoreRequest
         {
             public Data FetalData { get; }
 

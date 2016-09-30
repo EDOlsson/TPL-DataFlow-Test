@@ -13,14 +13,14 @@ namespace BackEnd
     {
         public DataStore()
         {
-            TheData = new Dictionary<SessionIdentifier, int>();
+            TheData = new Dictionary<SessionIdentifier, BedId>();
         }
 
         public SessionIdentifier Initialize(int age)
         {
             var id = new SessionIdentifier(CalculateNextId());
 
-            TheData[id] = TheData.Values.Any() ? TheData.Values.Max() + 10 : 10;
+            TheData[id] = new BedId(TheData.Values.Any() ? TheData.Values.Max(v => v.Id) + 10 : 10);
 
             return id;
         }
@@ -33,6 +33,6 @@ namespace BackEnd
             return TheData.Keys.Max(k => k.Id) + 1;
         }
 
-        internal IDictionary<SessionIdentifier, int> TheData { get; }
+        internal IDictionary<SessionIdentifier, BedId> TheData { get; }
     }
 }
