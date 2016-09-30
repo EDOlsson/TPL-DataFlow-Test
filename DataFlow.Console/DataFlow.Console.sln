@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackEnd", "BackEnd\BackEnd.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataFlowDemo", "DataFlowDemo\DataFlowDemo.csproj", "{5272D0C1-536C-4C3A-851E-FD59257FB28A}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AllDataFlow.Tests", "AllDataFlow.Tests\AllDataFlow.Tests.fsproj", "{F50413C9-2CE0-4689-993C-15D46B976626}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5272D0C1-536C-4C3A-851E-FD59257FB28A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5272D0C1-536C-4C3A-851E-FD59257FB28A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5272D0C1-536C-4C3A-851E-FD59257FB28A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F50413C9-2CE0-4689-993C-15D46B976626}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F50413C9-2CE0-4689-993C-15D46B976626}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F50413C9-2CE0-4689-993C-15D46B976626}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F50413C9-2CE0-4689-993C-15D46B976626}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

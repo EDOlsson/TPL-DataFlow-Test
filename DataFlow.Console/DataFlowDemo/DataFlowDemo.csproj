@@ -75,6 +75,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="IBackEndService.cs" />
     <Compile Include="InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="TraceListenerView.xaml.cs">
       <DependentUpon>TraceListenerView.xaml</DependentUpon>
