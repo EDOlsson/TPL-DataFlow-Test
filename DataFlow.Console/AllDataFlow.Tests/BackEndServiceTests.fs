@@ -86,3 +86,15 @@ let ``Given an initialized session When fetching analytics Then the service is p
     let actual = sut.FetchAnalyticsAsync(id).Result
 
     service.IdOfLastFetchedAnalytics |> should equal (Some (idLookup.TheData.[id]))
+
+[<Fact>]
+let ``Given no initialized sessions When deleting an unknown session Then xxx`` () =
+    let idLookup = new DataStore()
+    let service = new ServiceSpy()
+    let sut = new BackEndService(idLookup, service)
+
+    sut.DeleteSessionAsync(new SessionIdentifier()).Wait()
+
+[<Fact>]
+let ``Given an initialized session When deleting that session Then that session is removed`` () =
+    ()

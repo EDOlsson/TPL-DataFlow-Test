@@ -68,6 +68,8 @@
     <Compile Include="DataStore.cs" />
     <Compile Include="FakeSpectraService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Request\DataStoreRequest.cs" />
+    <Compile Include="Request\ServiceRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

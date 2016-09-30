@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using BackEnd.Request;
 using DataFlowDemo;
 
 namespace BackEnd
@@ -29,57 +30,6 @@ namespace BackEnd
             _spectraServiceBlock = new TransformBlock<ServiceRequest, object>(r => ContactSpectraService(r));
 
             _dataStoreBlock.LinkTo(_spectraServiceBlock);
-        }
-
-        ServiceRequest ProcessRequest(DataStoreRequest request)
-        {
-            var initRequest = request as CreateSessionRequest;
-            if (initRequest != null)
-            {
-                var id = _dataStore.Initialize(initRequest.Age);
-
-                return new NoOpServiceRequestWithId(id);
-            }
-
-            var postRequest = request as PostDataToSessionRequest;
-            if(postRequest != null)
-            {
-                var bed = _dataStore.TheData[postRequest.Id];
-                return new PostFetalDataServiceRequest(bed, postRequest.FetalData);
-            }
-
-            var fetchAnalytics = request as FetchIdForRetrievingAnalyticsDataStoreRequest;
-            if (fetchAnalytics != null)
-            {
-                var bed = _dataStore.TheData[fetchAnalytics.Id];
-                return new FetchAnalyticsServiceRequest(bed);
-            }
-
-            return ServiceRequest.EmptyRequest;
-        }
-
-        object ContactSpectraService(ServiceRequest request)
-        {
-            System.Diagnostics.Trace.WriteLine($"Processing request {request}.");
-
-            var initializeRequest = request as NoOpServiceRequestWithId;
-            if (initializeRequest != null)
-                return initializeRequest.Id;
-
-            var postRequest = request as PostFetalDataServiceRequest;
-            if(postRequest != null)
-            {
-                _spectraService.PostFetalData(postRequest.Id, postRequest.FetalData);
-                return null;
-            }
-
-            var fetchRequest = request as FetchAnalyticsServiceRequest;
-            if (fetchRequest != null)
-                return _spectraService.FetchAnalytics(fetchRequest.Id);
-
-
-            System.Diagnostics.Trace.WriteLine($"WARN - was not able to process request {request}.");
-            return null;
         }
 
         public async Task<SessionIdentifier> InitializeAsync(int age)
@@ -116,105 +66,71 @@ namespace BackEnd
             return Task.CompletedTask;
         }
 
-        class ServiceRequest
+        ServiceRequest ProcessRequest(DataStoreRequest request)
         {
-            public static readonly ServiceRequest EmptyRequest = new ServiceRequest();
-
-            protected ServiceRequest() { }
-
-            public override string ToString() => "Empty request";
-        }
-
-        class NoOpServiceRequestWithId : ServiceRequest
-        {
-            public SessionIdentifier Id { get; }
-
-            public NoOpServiceRequestWithId(SessionIdentifier id)
+            var initRequest = request as CreateSessionRequest;
+            if (initRequest != null)
             {
-                Id = id;
+                var id = _dataStore.Initialize(initRequest.Age);
+
+                return new NoOpServiceRequestWithId(id);
             }
 
-            public override string ToString() => string.Format($"No-op service request with Id {Id}.");
-        }
-
-        class PostFetalDataServiceRequest : ServiceRequest
-        {
-            public BedId Id { get; }
-
-            public Data FetalData { get; }
-
-            public PostFetalDataServiceRequest(BedId id, Data fetalData)
+            var postRequest = request as PostDataToSessionRequest;
+            if(postRequest != null)
             {
-                Id = id;
-                FetalData = fetalData;
+                var bed = LookupBedIdFromSessionId(postRequest.Id);
+                return new PostFetalDataServiceRequest(bed, postRequest.FetalData);
             }
 
-            public override string ToString() => string.Format($"Post fetal data for session {Id} : {FetalData}.");
-        }
-
-        class FetchAnalyticsServiceRequest : ServiceRequest
-        {
-            public BedId Id { get; }
-
-            public FetchAnalyticsServiceRequest(BedId id)
+            var fetchAnalytics = request as FetchIdForRetrievingAnalyticsDataStoreRequest;
+            if (fetchAnalytics != null)
             {
-                Id = id;
+                var bed = LookupBedIdFromSessionId(fetchAnalytics.Id);
+                return new FetchAnalyticsServiceRequest(bed);
             }
 
-            public override string ToString() => string.Format($"Fetch analytics for session {Id}.");
+            return ServiceRequest.EmptyRequest;
         }
 
-
-        abstract class DataStoreRequest { }
-
-        class CreateSessionRequest : DataStoreRequest
+        BedId LookupBedIdFromSessionId(SessionIdentifier id)
         {
-            public int Age { get; }
+            var bed = _dataStore.Lookup(id);
+            if (bed.Equals(BedId.None))
+                System.Diagnostics.Trace.WriteLine($"WARN - Session Id {id} was not found!");
 
-            public CreateSessionRequest(int age)
+            return bed;
+        }
+
+        object ContactSpectraService(ServiceRequest request)
+        {
+            System.Diagnostics.Trace.WriteLine($"Processing request {request}.");
+
+            var initializeRequest = request as NoOpServiceRequestWithId;
+            if (initializeRequest != null)
+                return initializeRequest.Id;
+
+            var postRequest = request as PostFetalDataServiceRequest;
+            if(postRequest != null)
             {
-                Age = age;
+                if (!postRequest.Id.Equals(BedId.None))
+                    _spectraService.PostFetalData(postRequest.Id, postRequest.FetalData);
+
+                return null;
             }
-        }
 
-        abstract class FetchIdFromDataStoreRequest : DataStoreRequest
-        {
-            public SessionIdentifier Id { get; }
-
-            protected FetchIdFromDataStoreRequest(SessionIdentifier id)
+            var fetchRequest = request as FetchAnalyticsServiceRequest;
+            if (fetchRequest != null)
             {
-                Id = id;
+                if(!fetchRequest.Id.Equals(BedId.None))
+                    return _spectraService.FetchAnalytics(fetchRequest.Id);
+
+                return null;
             }
+
+
+            System.Diagnostics.Trace.WriteLine($"WARN - was not able to process request {request}.");
+            return null;
         }
-
-        class FetchIdForRetrievingAnalyticsDataStoreRequest : FetchIdFromDataStoreRequest
-        {
-            public FetchIdForRetrievingAnalyticsDataStoreRequest(SessionIdentifier id) : base(id)
-            {
-            }
-        }
-
-        class DeleteSessionRequest : FetchIdFromDataStoreRequest
-        {
-            public DeleteSessionRequest(SessionIdentifier id) : base(id)
-            {
-            }
-        }
-
-        class PostDataToSessionRequest : FetchIdFromDataStoreRequest
-        {
-            public Data FetalData { get; }
-
-            public PostDataToSessionRequest(SessionIdentifier id, Data fetalData) : base(id)
-            {
-                FetalData = fetalData;
-            }
-        }
-
-        class DeleteAllSessionsRequest : DataStoreRequest
-        {
-
-        }
-
     }
 }

@@ -34,5 +34,13 @@ namespace BackEnd
         }
 
         internal IDictionary<SessionIdentifier, BedId> TheData { get; }
+
+        public BedId Lookup(SessionIdentifier key)
+        {
+            if (TheData.ContainsKey(key))
+                return TheData[key];
+
+            return BedId.None;
+        }
     }
 }

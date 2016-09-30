@@ -38,6 +38,8 @@ namespace BackEnd
         {
             Id = id;
         }
+
+        public static readonly BedId None = new BedId();
     }
 
     interface ISpectraService
